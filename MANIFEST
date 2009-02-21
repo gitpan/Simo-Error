@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Simo/Error.pm
+MANIFEST
+README
+t/00-load.t
+t/01-create_err_str.t
+t/02-accessor.t
+t/03-_create_err_hash.t
+t/04-create_from_err_str.t
+t/05-new.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
