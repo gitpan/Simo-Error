@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.01_01';
+our $VERSION = '0.0201';
 
 # accessor
 
@@ -201,9 +201,11 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.01_01
+Version 0.0201
 
 =cut
+
+=head1 
 
 =head1 DESCRIPTION
 
@@ -212,6 +214,12 @@ Simo::Error provide structured error system to Simo.
 You can create structure err message.
 
 If err is ocuured, You can get err object;
+
+=cut
+
+=head1 CAUTION
+
+Simo::Error is yet experimental stage.
 
 =cut
 
