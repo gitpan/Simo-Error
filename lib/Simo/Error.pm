@@ -1,10 +1,14 @@
 package Simo::Error;
 
+our $VERSION = '0.0202';
+
 use warnings;
 use strict;
 use Carp;
-
-our $VERSION = '0.0201';
+use overload '""' => sub{
+    my $self = shift;
+    return $self->msg . $self->pos;
+};
 
 # accessor
 
@@ -61,138 +65,39 @@ sub info{
 }
 
 sub new{
-    my ( $proto, %args ) = @_;
-    my $class = ref $proto || $proto;
-    my $self = \%args;
-    return bless $self, $class;
-}
+    my ( $proto, @args ) = @_;
 
-{
-    my $old_err_str = '';
-    my $cash_err_obj;
+    # bless
+    my $self = {};
+    my $pkg = ref $proto || $proto;
+    bless $self, $pkg;
     
-    sub create_from_err_str{
-        my ( $self, $err_str ) = @_;
-        return unless $err_str;
-        
-        if( $err_str eq $old_err_str ){
-             return $cash_err_obj;
-        }
-        
-        my $err_hash = $self->_create_err_hash( $err_str );
-        
-        my $err_obj = Simo::Error->new( %{ $err_hash } );
-        
-        $old_err_str = $err_str;
-        $cash_err_obj = $err_obj;
-        return $err_obj;
-    }
-}
-
-sub _create_err_hash{
-    my ( $self, $err_str_and_pos ) = @_;
-    
-    my $err_str;
-    my $pos;
-    my $is_simo_err = 1;
-    
-    my @token;
-    if( $err_str_and_pos =~ /^Error: \{( [^{}]*? )\}(.*)$/s ){
-        $err_str = $1;
-        $pos = $2 || '';
-        
-        $err_str = '' if $err_str eq '  '; # case: no args;
-        my $phase = 'key';
-        
-        OUTER: while( 1 ){
-            last if $err_str eq '';
-            
-            if( $phase eq 'key' ){
-                if( $err_str =~ s/ (\w+) => // ){
-                    push @token, $1;
-                    $phase = 'value';
-                }
-                else{
-                    $is_simo_err = 0;
-                    last;
-                }
-            }
-            elsif( $phase eq 'value' ){
-                if( $err_str =~ s/^'// ){
-                    my $single_quote_pos;
-                    my $search_pos = 0;
-                    
-                    while( 1 ){
-                        $single_quote_pos = index( $err_str, "'", $search_pos );
-                        if( $single_quote_pos == -1 ){
-                            $is_simo_err = 0;
-                            last OUTER;
-                        }
-                        else{
-                            if( substr( $err_str, $single_quote_pos - 1, 1) eq '\\' ){
-                                $search_pos = $single_quote_pos + 1;
-                                next;
-                            }
-                            
-                            my $value = substr( $err_str, 0, $single_quote_pos );
-                            $value =~ s/\\'/'/g;
-                            push @token, $value;
-                            $err_str = substr( $err_str, $single_quote_pos + 2 );
-                            $phase = 'key';
-                            last;
-                        }
-                    }
-                }
-                else{
-                    $is_simo_err = 0;
-                    last;
-                }
-            }
-        }
-    }
-    else{
-        $is_simo_err = 0;
-    }
-    
-    my $err_hash = {};
-    if( $is_simo_err ){
-        $err_hash = { @token };
-        my $type = delete $err_hash->{ type } || '';
-        my $msg = delete $err_hash->{ msg } || '';
-        $pos =~ s/\n/ /g;
-        
-        my $info = $err_hash;
-        $err_hash = { type => $type, msg => $msg, pos => $pos, info => $info };
-    }
-    else{
-        $err_hash = { type => 'unknown', msg => $err_str_and_pos, pos => '', info => {} };
-    }
-    
-    return $err_hash;
-}
-
-sub create_err_str{
-    my ( $self, @args ) = @_;
+    # check args
     @args = %{ $args[0] } if ref $args[0] eq 'HASH';
+    croak 'key-value pairs must be passed to new.' if @args % 2;
     
-    croak "key-value pairs must be passed to 'create_err_str'." if @args % 2;
-    
-    my %args = @args;
-    
-    my $err_str = qq/Error: { /;
-    
-    while( my ( $key, $value ) = splice( @args, 0, 2 ) ){
-        croak "Key must be word charcter." unless $key =~ /^\w+$/;
-        $err_str .= qq/$key => /;
-        $value =~ s/'/\\'/g;
-        $err_str .= qq/'$value', /;
+    # set args
+    while( my ( $attr, $val ) = splice( @args, 0, 2 ) ){
+        croak "Invalid key '$attr' is passed to new." unless $self->can( $attr );
+        
+        no strict 'refs';
+        $self->$attr( $val );
     }
     
-    $err_str =~ s/, $//;
+    $self->type( 'unknown' ) unless defined $self->type;
+    $self->msg( '' ) unless defined $self->msg;
+    $self->info( {} ) unless defined $self->info;
     
-    $err_str .= qq/ }/;
+    local $Carp::CarpLevel += 1;
+    $self->pos( Carp::shortmess("") ) unless $self->pos;
     
-    return $err_str;
+    return $self;
+}
+
+sub throw{
+    my $self = shift;
+    local $Carp::CarpLevel += 1;
+    die $self->new( @_ );
 }
 
 =head1 NAME
@@ -201,7 +106,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0201
+Version 0.0202
 
 =cut
 
@@ -227,36 +132,19 @@ Simo::Error is yet experimental stage.
 
     use Simo::Error;
     
-    # create structured error string
-    my $err_str = Simo::Error->create_err_str( 
+    # create error object;
+    my $err_str = Simo::Error->new( 
         type => 'err_type',
         msg => 'message',
-        a => 'some 1';
-        b => 'some 2';
+        info => { some1 => 'some info1', some2 => 'some info2' }
     );
     
-    # $err_str is 
-    # "Error: { type => 'err_type', msg => 'message' }"
-    
-    # this can use with croak or die;
-    eval{
-        croak $err;
-    }
-    
-    # get err object
-    my $err_obj = Simo::Error->create_from_err_str( $@ );
-    
-    # check err
-    if( $err_obj ){
-        if( $err_obj->type eq 'err_type' ){
-            my $msg = $err_obj->msg;
-            my $pos = $err_obj->pos; # error occured place, which 'croak' create.
-            my $info = $err_obj->info; # other than type, msg, pos is packed into info.
-            
-            my $a = $info->{ a };
-            my $b = $ingo->{ b };
-        }
-    }
+    # throw err
+    Simo::Error->throw( 
+        type => 'err_type',
+        msg => 'message',
+        info => { some1 => 'some info1', some2 => 'some info2' }
+    );
 
 =head1 CLASS METHOD
 
@@ -321,15 +209,26 @@ is constructor;
     my $err_obj = Simo::Error->new(
         type => 'err_type',
         msg => 'message',
-        pos => 'position error occured',
         info => { some1 => 'some info1', some2 => 'some info2' }
     );
 
-=head2 create_from_err_str
+=head2 throw
 
-is create Simo::Error object parsing error sting
+thorw error.
 
-Error string is usually created by create_err_str method.
+    Simo::Error->throw( 
+        type => 'err_type',
+        msg => 'message',
+        info => { some1 => 'some info1', some2 => 'some info2' }
+    );
+    
+This is same as
+
+    die Simo::Error->new( 
+        type => 'err_type',
+        msg => 'message',
+        info => { some1 => 'some info1', some2 => 'some info2' }
+    );
 
 =head1 AUTHOR
 
