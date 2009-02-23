@@ -75,3 +75,8 @@ package main;
     is( $@->type, 'unknown', 'object member type' );
     is( $@->msg, 'a', 'object member msg' );
 }
+
+{
+    my $t = Simo::Error->new( pos => '' );
+    is( $t->pos, '' , 'empty string' );
+}

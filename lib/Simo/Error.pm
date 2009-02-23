@@ -1,6 +1,6 @@
 package Simo::Error;
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0203';
 
 use warnings;
 use strict;
@@ -89,7 +89,7 @@ sub new{
     $self->info( {} ) unless defined $self->info;
     
     local $Carp::CarpLevel += 1;
-    $self->pos( Carp::shortmess("") ) unless $self->pos;
+    $self->pos( Carp::shortmess("") ) unless defined $self->pos;
     
     return $self;
 }
@@ -106,7 +106,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0202
+Version 0.0203
 
 =cut
 
