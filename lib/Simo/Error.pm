@@ -1,6 +1,6 @@
 package Simo::Error;
 
-our $VERSION = '0.0203';
+our $VERSION = '0.0204';
 
 use warnings;
 use strict;
@@ -64,6 +64,45 @@ sub info{
     }
 }
 
+sub pkg{
+    my $self = shift;
+    
+    if( @_ ){
+        my $old = $self->{ pkg };
+        $self->{ pkg } = $_[0];
+        return $old;
+    }
+    else{
+        return $self->{ pkg };
+    }
+}
+
+sub attr{
+    my $self = shift;
+    
+    if( @_ ){
+        my $old = $self->{ attr };
+        $self->{ attr } = $_[0];
+        return $old;
+    }
+    else{
+        return $self->{ attr };
+    }
+}
+
+sub val{
+    my $self = shift;
+    
+    if( @_ ){
+        my $old = $self->{ val };
+        $self->{ val } = $_[0];
+        return $old;
+    }
+    else{
+        return $self->{ val };
+    }
+}
+
 sub new{
     my ( $proto, @args ) = @_;
 
@@ -106,7 +145,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0203
+Version 0.0204
 
 =cut
 
@@ -176,6 +215,8 @@ This method is used with croak or die.
 
 =head1 ACCESSOR
 
+You can contain variouse error information.
+
 =head2 type
 
 is error type.
@@ -191,6 +232,18 @@ is position in which error is occured.
 You do not have to specify this attr in create_err_str argument.
 
 pos is automatically set, parsing croak message or die message.
+
+=head2 pkg
+
+is package name
+
+=head2 attr
+
+is attr name
+
+=head2 val
+
+is attr value
 
 =head3 info
 

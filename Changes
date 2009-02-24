@@ -1,3 +1,5 @@
+0.0204
+    add accessor( pkg, attr, val )
 0.0203
     bag fix pos empty string 
 0.0202

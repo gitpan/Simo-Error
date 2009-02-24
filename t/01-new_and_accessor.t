@@ -16,16 +16,29 @@ sub throw_err{
 package main;
 
 {
-    my $t = Simo::Error->new( type => 1, msg => 2, pos => 3, info => { a => 1 } );
+    my $t = Simo::Error->new(
+        type => 1,
+        msg => 2,
+        pos => 3,
+        info => { a => 1 },
+        pkg => 4,
+        attr => 5,
+        val => 6
+    );
     isa_ok( $t, 'Simo::Error' );
     
     my $old_type = $t->type( 11 );
     my $old_msg = $t->msg( 22 );
     my $old_pos = $t->pos( 33 );
     my $old_info = $t->info( { b => 2 } );
+    my $old_pkg = $t->pkg( 44 );
+    my $old_attr = $t->attr( 55 );
+    my $old_val = $t->val( 66 );
     
-    is_deeply( [ $old_type, $old_msg, $old_pos, $old_info ], [ 1, 2, 3, { a => 1 } ], 'old value' );
-    is_deeply( [ $t->type, $t->msg, $t->pos, $t->info ], [ 11, 22, 33, { b => 2 } ], 'set value' );
+    is_deeply( [ $old_type, $old_msg, $old_pos, $old_info, $old_pkg, $old_attr, $old_val ], 
+               [ 1, 2, 3, { a => 1 }, 4, 5, 6 ], 'old value' );
+    is_deeply( [ $t->type, $t->msg, $t->pos, $t->info, $t->pkg, $t->attr, $t->val ],
+               [ 11, 22, 33, { b => 2 }, 44, 55, 66 ], 'set value' );
 }
 
 {
