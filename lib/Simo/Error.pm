@@ -1,6 +1,6 @@
 package Simo::Error;
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0205';
 
 use warnings;
 use strict;
@@ -10,8 +10,7 @@ use overload '""' => sub{
     return $self->msg . $self->pos;
 };
 
-# accessor
-
+### accessor
 sub type{
     my $self = shift;
     
@@ -35,32 +34,6 @@ sub msg{
     }
     else{
         return $self->{ msg };
-    }
-}
-
-sub pos{
-    my $self = shift;
-    
-    if( @_ ){
-        my $old = $self->{ pos };
-        $self->{ pos } = $_[0];
-        return $old;
-    }
-    else{
-        return $self->{ pos };
-    }
-}
-
-sub info{
-    my $self = shift;
-    
-    if( @_ ){
-        my $old = $self->{ info };
-        $self->{ info } = $_[0];
-        return $old;
-    }
-    else{
-        return $self->{ info };
     }
 }
 
@@ -103,6 +76,32 @@ sub val{
     }
 }
 
+sub pos{
+    my $self = shift;
+    
+    if( @_ ){
+        my $old = $self->{ pos };
+        $self->{ pos } = $_[0];
+        return $old;
+    }
+    else{
+        return $self->{ pos };
+    }
+}
+
+sub info{
+    my $self = shift;
+    
+    if( @_ ){
+        my $old = $self->{ info };
+        $self->{ info } = $_[0];
+        return $old;
+    }
+    else{
+        return $self->{ info };
+    }
+}
+
 sub new{
     my ( $proto, @args ) = @_;
 
@@ -133,10 +132,12 @@ sub new{
     return $self;
 }
 
+# die with Simo::Error object
 sub throw{
     my $self = shift;
     local $Carp::CarpLevel += 1;
-    die $self->new( @_ );
+    my $err_obj = $self->new( @_ );
+    die $err_obj;
 }
 
 =head1 NAME
@@ -145,7 +146,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0204
+Version 0.0205
 
 =cut
 
@@ -184,34 +185,6 @@ Simo::Error is yet experimental stage.
         msg => 'message',
         info => { some1 => 'some info1', some2 => 'some info2' }
     );
-
-=head1 CLASS METHOD
-
-=head2 create_err_str
-
-create structured error string.
-
-    my $err_str = Simo::Error->create_err_str( 
-        type => 'err_type',
-        msg => 'message'
-    );
-
-Structured error stirng is like
-
-    Error: { type => 'err_type', msg => 'message' }
-
-You can convert this stuructured error string to error object
-by using create_from_err_str.
-
-This method is used with croak or die.
-
-    croak Simo::Error->create_err_str( 
-        type => 'err_type',
-        msg => 'message'
-    );
-    
-=cut
-
 
 =head1 ACCESSOR
 
