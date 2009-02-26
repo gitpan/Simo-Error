@@ -1,6 +1,6 @@
 ---
 name: Simo-Error
-version: 0.0205
+version: 0.0206
 author:
   - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
 abstract: Error object for Simo
@@ -8,13 +8,13 @@ license: perl
 resources:
   license: ~
 requires:
-  Carp: 0
+  Carp: 1.04
 build_requires:
   Test::More: 0
 provides:
   Simo::Error:
     file: lib/Simo/Error.pm
-    version: 0.0205
+    version: 0.0206
 generated_by: Module::Build version 0.31012
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

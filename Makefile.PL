@@ -8,7 +8,7 @@ WriteMakefile
           'VERSION_FROM' => 'lib/Simo/Error.pm',
           'PREREQ_PM' => {
                            'Test::More' => 0,
-                           'Carp' => 0
+                           'Carp' => '1.04'
                          }
         )
 ;

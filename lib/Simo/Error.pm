@@ -1,6 +1,6 @@
 package Simo::Error;
 
-our $VERSION = '0.0205';
+our $VERSION = '0.0206';
 
 use warnings;
 use strict;
@@ -146,7 +146,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0205
+Version 0.0206
 
 =cut
 

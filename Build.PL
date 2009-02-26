@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
-        'Carp' => 0,
+        'Carp' => 1.04,
     },
     add_to_cleanup      => [ 'Simo-Error-*' ],
     create_makefile_pl => 'traditional',
