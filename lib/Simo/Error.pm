@@ -1,6 +1,7 @@
 package Simo::Error;
+use 5.008_001;
 
-our $VERSION = '0.0206';
+our $VERSION = '0.0207';
 
 use warnings;
 use strict;
@@ -124,6 +125,8 @@ sub new{
     
     $self->type( 'unknown' ) unless defined $self->type;
     $self->msg( '' ) unless defined $self->msg;
+    $self->pkg( '' ) unless defined $self->pkg;
+    $self->attr( '' ) unless defined $self->attr;
     $self->info( {} ) unless defined $self->info;
     
     local $Carp::CarpLevel += 1;
@@ -146,7 +149,7 @@ Simo::Error - Error object for Simo
 
 =head1 VERSION
 
-Version 0.0206
+Version 0.0207
 
 =cut
 
@@ -165,6 +168,8 @@ If err is ocuured, You can get err object;
 =head1 CAUTION
 
 Simo::Error is yet experimental stage.
+
+Please wait untill Simo::Error is stable.
 
 =cut
 

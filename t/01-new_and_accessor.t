@@ -59,6 +59,8 @@ package main;
 {
     my $t = Simo::Error->new;
     like( $t->pos, qr/at/, 'err postion' );
+    is( $t->pkg, '', 'pkg default' );
+    is( $t->attr, '', 'attr default' );
 }
 
 {
